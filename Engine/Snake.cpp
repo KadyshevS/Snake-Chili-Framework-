@@ -65,7 +65,12 @@ void SnakeBoard::Draw()
 		}
 	}
 }
-void SnakeBoard::ChgTileColor(const unsigned short TileX, const unsigned short TileY, const unsigned short R, const unsigned short G, const unsigned short B)
+void SnakeBoard::ChgTileColor(
+	const unsigned short TileX, 
+	const unsigned short TileY, 
+	const unsigned short R, 
+	const unsigned short G, 
+	const unsigned short B)
 {
 	assert(TileX < tilesXcount);
 	assert(TileY < tilesYcount);
@@ -79,6 +84,31 @@ void SnakeBoard::ResetTileColor(const unsigned short TileX, const unsigned short
 	c_tiles[TileX][TileY].r = 50;
 	c_tiles[TileX][TileY].g = 50;
 	c_tiles[TileX][TileY].b = 50;
+}
+
+/*************************/
+/* Fruit			  	 */
+/*************************/
+Fruit::Fruit(const int posX, const int posY)
+{
+	Init(posX, posY);
+}
+
+void Fruit::Init(const int posX, const int posY)
+{
+	assert(isInit == false);
+	fruit.x = posX;
+	fruit.y = posY;
+	isInit = true;
+}
+void Fruit::Eat(const int nextX, const int nextY)
+{
+	fruit.x = nextX;
+	fruit.y = nextY;
+}
+Vec2 Fruit::GetPos()
+{
+	return fruit;
 }
 
 /*************************/
@@ -97,6 +127,7 @@ void Snake::Init(Graphics& Gfx, const unsigned short startX, const unsigned shor
 	assert(startY <= board.tilesYcount);
 
 	board.Init(Gfx);
+	fruit.Init(xDist(rng), yDist(rng));
 
 	snek.push_back(Vec2(startX, startY));
 	for (int i = 1; i < length; i++)
@@ -109,6 +140,21 @@ void Snake::Init(Graphics& Gfx, const unsigned short startX, const unsigned shor
 
 void Snake::Update(Keyboard& kbd, const float dt)
 {
+	bool isFruitInSnake = false;
+	for (int i = 0; i < length; i++)
+	{
+		if (snek[i].y == fruit.GetPos().y && snek[i].x == fruit.GetPos().x) 
+		{
+			isFruitInSnake = true;
+			break;
+		}
+	}
+	if (isFruitInSnake)
+	{
+		fruit.Eat(xDist(rng), yDist(rng));
+		Grow();
+	}
+
 	if (kbd.KeyIsPressed(keyUp))
 	{
 		if (inhibitUp) {}
@@ -177,6 +223,7 @@ void Snake::Update(Keyboard& kbd, const float dt)
 void Snake::Draw()
 {
 	board.Draw();
+	
 	for (int i = 0; i < board.tilesXcount; i++)
 	{
 		for (int j = 0; j < board.tilesYcount; j++)
@@ -185,11 +232,17 @@ void Snake::Draw()
 				board.ResetTileColor(i, j);
 		}
 	}
+	board.ChgTileColor(fruit.GetPos().x, fruit.GetPos().y, colorFruit.r, colorFruit.g, colorFruit.b);
 	board.ChgTileColor(snek[0].x, snek[0].y, colorSnake.r, colorSnake.g, colorSnake.b);
 	for (int i = 1; i < length; i++)
 	{
 		board.ChgTileColor(snek[i].x, snek[i].y, colorTale.r, colorTale.g, colorTale.b);
 	}
+}
+
+std::vector<Vec2> Snake::GetPos()
+{
+	return snek;
 }
 
 void Snake::MoveUp(const float dt)
@@ -281,11 +334,20 @@ void Snake::MoveRight(const float dt)
 	}
 }
 
+void Snake::Grow()
+{
+	snek.push_back(Vec2(snek[length - 1].x, snek[length - 1].y));
+	snek.push_back(Vec2(snek[length - 1].x, snek[length - 1].y));
+	length += 2;
+}
+
 bool Snake::isTileEmpty(const short TileX, const short TileY)
 {
 	for (int i = 0; i < length; i++)
 		if (snek[i].x == TileX && snek[i].y == TileY)
 			return false;
+	if (fruit.GetPos().x == TileX && fruit.GetPos().y == TileX)
+		return false;
 
 	return true;
 }

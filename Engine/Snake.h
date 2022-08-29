@@ -4,6 +4,7 @@
 #include "Vec2.h"
 #include "Color_m.h"
 #include <vector>
+#include <random>
 
 class SnakeBoard
 {
@@ -46,11 +47,28 @@ private:
 	bool isInit = false;
 
 	friend class Snake;
+	friend class Fruit;
 };
 
 enum SnakeDirection
 {
 	STOP, UP, DOWN, LEFT, RIGHT
+};
+class Fruit
+{
+public:
+	Fruit() = default;
+	Fruit(const int posX, const int posY);
+
+	void Init(const int posX, const int posY);
+	void Eat(const int nextX, const int nextY);
+
+	Vec2 GetPos();
+
+private:
+	Vec2 fruit;
+
+	bool isInit = false;
 };
 class Snake
 {
@@ -70,26 +88,37 @@ public:
 	void Update(Keyboard& kbd, const float dt);
 	void Draw();
 
+	std::vector<Vec2> GetPos();
+
 private:
 	void MoveUp(const float dt);
 	void MoveDown(const float dt);
 	void MoveLeft(const float dt);
 	void MoveRight(const float dt);
 
+	void Grow();
+
 private:
 	SnakeBoard board;
 	SnakeDirection dir = STOP;
 	Color_m colorSnake = Color_m(0, 255, 0);
 	Color_m colorTale = Color_m(255, 255, 0);
+	Color_m colorFruit = Color_m(255, 0, 0);
 	unsigned int length = 10;
 
 #ifndef NDEBUG
 	float velocity = 0.295 * 60.0f;
 #else
-	float velocity = 0.295 * 60.0f;
+	float velocity = 0.997 * 60.0f;
 #endif
 
 	std::vector<Vec2> snek;
+	Fruit fruit;
+
+	std::random_device rd;
+	std::mt19937 rng = std::mt19937(rd());
+	std::uniform_int_distribution<int> xDist = std::uniform_int_distribution<int>(0, board.tilesXcount-1);
+	std::uniform_int_distribution<int> yDist = std::uniform_int_distribution<int>(0, board.tilesYcount - 1);
 
 	unsigned int
 		keyUp    = VK_UP    ,
