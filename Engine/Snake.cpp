@@ -91,12 +91,17 @@ Snake::Snake(Graphics& Gfx, const unsigned short startX, const unsigned short st
 
 void Snake::Init(Graphics& Gfx, const unsigned short startX, const unsigned short startY)
 {
+	assert(startX >= 0);
+	assert(startX <= board.tilesXcount);
+	assert(startY >= 0);
+	assert(startY <= board.tilesYcount);
+
 	board.Init(Gfx);
 
-	snek.push_back(Vec2(15, 15));
+	snek.push_back(Vec2(startX, startY));
 	for (int i = 1; i < length; i++)
 	{
-		snek.push_back(Vec2(15+i, 15));
+		snek.push_back(Vec2(startX +i, startY));
 	}
 
 	isInit = true;
@@ -192,8 +197,7 @@ void Snake::MoveUp(const float dt)
 	bool isInTale = false;
 	for (int i = 0; i < length; i++)
 	{
-		if( snek[0].y - int(velocity*dt) != snek[i].y || snek[0].x != snek[i].x )
-		{}
+		if( snek[0].y - int(velocity*dt) != snek[i].y || snek[0].x != snek[i].x ) {}
 		else
 		{
 			isInTale = true;
@@ -215,9 +219,7 @@ void Snake::MoveDown(const float dt)
 	bool isInTale = false;
 	for (int i = 0; i < length; i++)
 	{
-		if (snek[0].y + int(velocity*dt) != snek[i].y || snek[0].x != snek[i].x)
-		{
-		}
+		if (snek[0].y + int(velocity*dt) != snek[i].y || snek[0].x != snek[i].x) {}
 		else
 		{
 			isInTale = true;
@@ -239,9 +241,7 @@ void Snake::MoveLeft(const float dt)
 	bool isInTale = false;
 	for (int i = 0; i < length; i++)
 	{
-		if (snek[0].y != snek[i].y || snek[0].x - int(velocity*dt) != snek[i].x)
-		{
-		}
+		if (snek[0].y != snek[i].y || snek[0].x - int(velocity*dt) != snek[i].x) {}
 		else
 		{
 			isInTale = true;
@@ -263,9 +263,7 @@ void Snake::MoveRight(const float dt)
 	bool isInTale = false;
 	for (int i = 0; i < length; i++)
 	{
-		if (snek[0].y != snek[i].y || snek[0].x + int(velocity*dt) != snek[i].x)
-		{
-		}
+		if (snek[0].y != snek[i].y || snek[0].x + int(velocity*dt) != snek[i].x) {}
 		else
 		{
 			isInTale = true;
@@ -286,10 +284,8 @@ void Snake::MoveRight(const float dt)
 bool Snake::isTileEmpty(const short TileX, const short TileY)
 {
 	for (int i = 0; i < length; i++)
-	{
 		if (snek[i].x == TileX && snek[i].y == TileY)
 			return false;
-	}
 
 	return true;
 }

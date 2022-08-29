@@ -26,7 +26,7 @@ Game::Game( MainWindow& wnd )
 	wnd( wnd ),
 	gfx( wnd )
 {
-	curs.Init(gfx);
+	snek.Init(gfx, 15, 15);
 }
 
 void Game::Go()
@@ -43,10 +43,10 @@ void Game::UpdateModel()
 		wnd.Kill();
 
 	const float dt = ft.Mark();
-	curs.Update(wnd.mouse, dt);
+	snek.Update(wnd.kbd, dt);
 }
 
 void Game::ComposeFrame()
 {
-	curs.Draw();
+	snek.Draw();
 }
